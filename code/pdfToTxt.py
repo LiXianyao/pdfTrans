@@ -36,6 +36,7 @@ class Pdf2TxtManager:
 
     def changePdfToTxt(self, fileName):
         pageNum, page_context = self.readPdfInPages(fileName)
+        #exit(0)
         file_num = pageNum / 100
         if pageNum % 100 > 0:
             file_num += 1
@@ -113,43 +114,65 @@ class Pdf2TxtManager:
                         break
 
                     text = x.get_text()
-                    endl = False
-                    if text.find(" \n") != -1:  ##是某段话的结尾
-                        endl = True
-
-                    text = "".join(text.split("\n"))
-                    text = text.strip()
-                    if len(text) == 0:
-                        continue
-
-                    if last_row_endl:  # 上一行结束了
-                        pages_context[pagecnt].append(text) ##新起一行
-                        last_row_endl = endl
-                    elif last_page_endl:  # 上一行没结束但是上一页结束了
-                        pages_context[pagecnt][-1] += text
-                        last_row_endl = endl
-                    else: ##上一页的最后一行没结束
-                        pages_context[self.lastPage(pages_context, pagecnt)][-1] += text
-                        last_page_endl = endl
-                        last_row_endl = endl
+                    if text.find(" \n"):  ##包含某段话的结尾
+                        texts = text.split(" \n")
+                        for idx in range(len(texts)):
+                            if idx == len(texts) - 1:
+                                endl = False
+                            else:
+                                endl = True
+                            last_row_endl, last_page_endl = self.addNewSentence(texts[idx], last_row_endl,
+                                                            last_page_endl, pagecnt, pages_context, endl)
+                    else:
+                        last_row_endl, last_page_endl = self.addNewSentence(text, last_row_endl,
+                                                                            last_page_endl, pagecnt, pages_context,
+                                                                            endl=False)
                 #print layout_cnt, layout_max
                 #print "page %d finish" % (pagecnt + 1)
                 pagecnt += 1
+                #if pagecnt == 4:
+                #    break
                 if pagecnt % 100 == 0:
                     print u"已处理%d页数据 " % (pagecnt)
             print "process end!"
             return pagecnt, pages_context
 
+    def addNewSentence(self, text, last_row_endl, last_page_endl, pagecnt, pages_context, endl):
+        text = "".join(text.split("\n"))
+        text = text.strip()
+        if len(text) == 0:
+            return last_row_endl, last_page_endl
+        # print "Page%d" % pagecnt, x.get_text(), last_row_endl, last_page_endl
+
+        if last_row_endl:  # 上一行结束了
+            pages_context[pagecnt].append(text)  ##新起一行
+            last_row_endl = endl
+        elif last_page_endl:  # 上一行没结束但是上一页结束了
+            pages_context[pagecnt][-1] += text
+            last_row_endl = endl
+        else:  ##上一页的最后一行没结束
+            try:
+                pages_context[self.lastPage(pages_context, pagecnt)][-1] += text
+            except:
+                print pagecnt, text
+                exit(0)
+            last_page_endl = endl
+            last_row_endl = endl
+        return last_row_endl, last_page_endl
+
     def lastPage(self, pages_context, pagecnt):
-        while pagecnt > 1:
+        while pagecnt >= 1:
             pagecnt -= 1
             if len(pages_context[pagecnt]):
                 return pagecnt
+        for i in range(len(pages_context)):
+            print "Page %d has rows %d" % (i, len(pages_context[i]))
+
 
 
 if __name__=="__main__":
-    #file_name = "P020190322710168971456.pdf"
-    file_name = "科大讯飞招股说明书.pdf"
+    file_name = "P020190417560516474414.pdf"
+    #file_name = "科大讯飞招股说明书.pdf"
     task = Pdf2TxtManager()
     task.changePdfToTxt(fileName=file_name)
     #text = task.convert_pdf_2_text(file_name)
