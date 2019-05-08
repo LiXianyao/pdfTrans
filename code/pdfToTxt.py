@@ -171,7 +171,7 @@ class Pdf2TxtManager:
 
 
 if __name__=="__main__":
-    file_name = "P020190417560516474414.pdf"
+    file_name = "P020190417559402574530.pdf"
     #file_name = "科大讯飞招股说明书.pdf"
     task = Pdf2TxtManager()
     task.changePdfToTxt(fileName=file_name)
