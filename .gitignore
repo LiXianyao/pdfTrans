@@ -1,3 +1,3 @@
 .idea/
-./code/mysql_storage/databse.py
-./result/*.txt
+code/mysql_storage/database.py
+result/*.txt
