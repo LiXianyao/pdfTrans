@@ -17,10 +17,10 @@ class RelationMark(Base):
     # 查询构造器、、、
     query = db_session.query_property()
 
-    def __init__(self, content, relation_no, relation_name):
+    def __init__(self, content, relation_name, relation_no):
         self.content = content
-        self.relation_no = relation_no
         self.relation_name = relation_name
+        self.relation_no = relation_no
 
     def __repr__(self):
         relation_dict = {
