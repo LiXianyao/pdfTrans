@@ -13,7 +13,7 @@ class RelationMark(Base):
     relation_name = Column(String(255), nullable=True)
     reviewed = Column(Boolean, default=False)  # 是否被审核过
     ver_date = Column(Date, nullable=True)
-    user_id = Column(Integer, default=1)
+    user_id = Column(Integer, nullable=True)  # 是审核数据的人的id！不是数据上传人
     # 查询构造器、、、
     query = db_session.query_property()
 
