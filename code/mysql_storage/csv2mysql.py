@@ -55,5 +55,5 @@ def relation2mysql(time_dir):
 
 if __name__=="__main__":
     dir = "20190501"
-    #entity2mysql(dir)
+    entity2mysql(dir)
     relation2mysql(dir)
