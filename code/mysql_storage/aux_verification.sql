@@ -22,7 +22,7 @@ create table if not exists rela_name_no
 		unique (rela_name),
 	constraint rela_name_no_rela_no_uindex
 		unique (rela_no)
-)
+)charset=utf8
 ;
 
 create table if not exists relation_mark
