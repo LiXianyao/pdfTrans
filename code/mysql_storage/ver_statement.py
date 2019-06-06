@@ -9,15 +9,17 @@ class VerStatement(Base):
     id = Column(Integer,autoincrement=True, primary_key=True)
     mark_user = Column(String, nullable=True) # 数据的标记人
     pdf_no = Column(Integer, nullable=False) # pdf的页码
-    pdf_path = Column(Text, nullable=False)  # pdf的文件名
-    state = Column(Integer, default=-1)  # 3种状态，未审核、审核中、审核完毕
+    pdf_path = Column(String, nullable=False)  # pdf的文件名
+    mark_id = Column(Integer, nullable=False)  # 由pdf_path、pdf_no和mark_id构成一个独立三元组
+    state = Column(Integer, default=0)  # 3种状态，未审核、审核中、审核完毕
     user_id = Column(Integer, nullable=True)  # 是审核数据的人的id！不是数据上传人
     # 查询构造器、、、
     query = db_session.query_property()
 
-    def __init__(self, pdf_no, pdf_path, mark_user=None):
+    def __init__(self, pdf_no, pdf_path, mark_id, mark_user=None):
         self.pdf_no = pdf_no
         self.pdf_path = pdf_path
+        self.mark_id = mark_id
         if mark_user:
             self.mark_user = mark_user
 
