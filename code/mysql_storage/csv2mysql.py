@@ -7,6 +7,7 @@ from database import db_session
 from data_completion import content_completion
 import csv
 import sys
+import traceback
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
@@ -59,26 +60,32 @@ def relation2mysql(time_dir):
     cnt_suc = 0
     for row in data:
         nrows += 1
-        pdf_path = str(row[0].strip())
-        pdf_page = int(row[1].strip())
-        mark_id = int(row[2].strip())
-        statement = db_session.query(VerStatement).filter(
-            VerStatement.pdf_path == pdf_path,
-            VerStatement.pdf_no   == pdf_page,
-            VerStatement.mark_id  == mark_id
-        ).first()
-        if statement == None:
-            print "pdf_path=%s, pdf_page=%d, mark_id=%d" % (pdf_path, pdf_page, mark_id)
-        assert (statement != None) # 必须存在对应的entity
+        #print len(row)
+        #print "%s / %s " % (row[0], row[1])
+        try:
+            pdf_path = str(row[0].strip())
+            pdf_page = int(row[1].strip())
+            mark_id = int(row[2].strip())
+            statement = db_session.query(VerStatement).filter(
+                VerStatement.pdf_path == pdf_path,
+                VerStatement.pdf_no   == pdf_page,
+                VerStatement.mark_id  == mark_id
+            ).first()
+            if statement == None:
+                print "pdf_path=%s, pdf_page=%d, mark_id=%d" % (pdf_path, pdf_page, mark_id)
+            assert (statement != None) # 必须存在对应的entity
 
-        stat_id = statement.id
-        relation_no = row[5].strip()
-        relation_no = int(relation_no)
-        content = "".join([ seg.strip() for seg in row[6:]])
+            stat_id = statement.id
+            relation_no = row[5].strip()
+            relation_no = int(relation_no)
+            content = "".join([ seg.strip() for seg in row[6:]])
 
-        newRelation = RelationMark(content, relation_no, stat_id)
-        relationList.append(newRelation)
-        cnt_suc += 1
+            newRelation = RelationMark(content, relation_no, stat_id)
+            relationList.append(newRelation)
+            cnt_suc += 1
+        except:
+            print u"数据行%d 存在异常" % nrows
+            print traceback.format_exc()
     db_session.add_all(relationList)
     db_session.commit()
     del relationList[:]
