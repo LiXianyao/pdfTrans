@@ -14,6 +14,7 @@ def content_completion(content):
     content = content.decode("utf-8")
     content = content.replace("<o", "</o")
     content = content.replace('<n', '</n')
+    content = completAngleBrackets(content)
     if content[0:4] == "</o>":  # 句首有多余的标注
         content = content[4:]
     if content[-1] != ">":  # 句尾漏了标注
@@ -49,7 +50,22 @@ def fill_org(content):
         index = content.find(u"发行人", next_index(index), -1)
     return content
 
+def completAngleBrackets(content):
+    pattern = ["/o", "/n"]
+    for idx in range(len(pattern)):
+        loc = content.find(pattern[idx])
+        while(loc != -1):
+            pre = True if content[loc - 1] == "<" else False
+            tail = True if content[loc + idx + 2] == ">" else False
+            if pre or tail:  # 只对缺一边的做补救
+                if not pre:
+                    content = content[:loc] + "<" + content[loc:]
+                elif not tail:
+                    content = content[:loc + idx + 2] + ">" + content[loc + idx + 2:]
+            loc = content.find(pattern[idx], loc + 2)
+    return content
+
 if __name__=="__main__":
     c = content_completion
-    s = u"报告期内，发行人不存在向单一客户销售比例超过 </o>50.00%</np>或严重依赖少数客户的情况"
+    s = u"(4)</o2007 年</nt以来为了推动国内市场日益增长的个性化语音合成应用需求及多语种应用需求同时拓展国际市场发行人"
     print c(s)
